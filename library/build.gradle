@@ -1,5 +1,8 @@
 apply plugin: 'com.android.library'
 
+group='com.github.mna'
+version = '0.0.3'
+
 repositories {
     mavenCentral()
 }
@@ -18,5 +21,3 @@ android {
         abortOnError false
     }
 }
-
-apply from: '../maven_push.gradle'
