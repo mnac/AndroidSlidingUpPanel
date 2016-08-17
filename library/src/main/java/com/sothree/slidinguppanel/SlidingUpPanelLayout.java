@@ -877,6 +877,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+        Log.d("onInterceptTouchEvent", "-------------- Start ----------------");
         Log.d("onInterceptTouchEvent", "Action: " + ev.getAction());
         Log.d("onInterceptTouchEvent", "History Size: " + ev.getHistorySize());
         Log.d("onInterceptTouchEvent", "History Size: " + ev.getHistorySize());
@@ -954,6 +955,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         final int action = MotionEventCompat.getActionMasked(ev);
+        Log.d("dispatchTouchEvent", "-------------- Start ----------------");
         Log.d("dispatchTouchEvent", "Action masked: " + action);
         if (!isEnabled() || !isTouchEnabled() || (mIsUnableToDrag && action != MotionEvent.ACTION_DOWN)) {
             mDragHelper.abort();
@@ -1027,6 +1029,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                     Log.d("dispatchTouchEvent", "After panel handle --> Send a down");
                 }
 
+                Log.d("dispatchTouchEvent", "Otherwise --> Dispatch touchEvent");
                 mIsScrollableViewHandlingTouch = true;
                 return super.dispatchTouchEvent(ev);
             }
