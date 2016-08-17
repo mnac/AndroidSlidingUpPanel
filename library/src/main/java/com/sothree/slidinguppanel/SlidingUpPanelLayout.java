@@ -15,6 +15,7 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -876,6 +877,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+        Log.d("onInterceptTouchEvent", "Action: " + ev.getAction());
+        Log.d("onInterceptTouchEvent", "History Size: " + ev.getHistorySize());
+        Log.d("onInterceptTouchEvent", "History Size: " + ev.getHistorySize());
         // If the scrollable view is handling touch, never intercept
         if (mIsScrollableViewHandlingTouch || !isTouchEnabled()) {
             mDragHelper.abort();
@@ -891,6 +895,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
         switch (action) {
             case MotionEvent.ACTION_DOWN: {
+                Log.d("onInterceptTouchEvent", "Case: Action DOWN");
                 mIsUnableToDrag = false;
                 mInitialMotionX = x;
                 mInitialMotionY = y;
@@ -898,6 +903,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             }
 
             case MotionEvent.ACTION_MOVE: {
+                Log.d("onInterceptTouchEvent", "Case: Action MOVE");
                 if ((ady > dragSlop && adx > ady) || !isViewUnder(mDragView, (int) mInitialMotionX, (int) mInitialMotionY)) {
                     mDragHelper.cancel();
                     mIsUnableToDrag = true;
@@ -908,6 +914,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
+                Log.d("onInterceptTouchEvent", "Case: Action UP");
+
                 // If the dragView is still dragging when we get here, we need to call processTouchEvent
                 // so that the view is settled
                 // Added to make scrollable views work (tokudu)
@@ -925,6 +933,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 }
                 break;
         }
+        Log.d("onInterceptTouchEvent", "Helper intercept");
         return mDragHelper.shouldInterceptTouchEvent(ev);
     }
 
@@ -945,24 +954,29 @@ public class SlidingUpPanelLayout extends ViewGroup {
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         final int action = MotionEventCompat.getActionMasked(ev);
-
+        Log.d("dispatchTouchEvent", "Action masked: " + action);
         if (!isEnabled() || !isTouchEnabled() || (mIsUnableToDrag && action != MotionEvent.ACTION_DOWN)) {
             mDragHelper.abort();
             return super.dispatchTouchEvent(ev);
         }
 
         final float y = ev.getY();
+        Log.d("dispatchTouchEvent", "y = " + y);
+        Log.d("dispatchTouchEvent", "x = " + ev.getX());
 
         if (action == MotionEvent.ACTION_DOWN) {
+            Log.d("dispatchTouchEvent", "ACTION DOWN");
             mIsScrollableViewHandlingTouch = false;
             mPrevMotionY = y;
         } else if (action == MotionEvent.ACTION_MOVE) {
+            Log.d("dispatchTouchEvent", "Action MOVE");
             float dy = y - mPrevMotionY;
             mPrevMotionY = y;
 
             // If the scroll view isn't under the touch, pass the
             // event along to the dragView.
             if (!isViewUnder(mScrollableView, (int) mInitialMotionX, (int) mInitialMotionY)) {
+                Log.d("dispatchTouchEvent", "Under View --> Dispatch event");
                 return super.dispatchTouchEvent(ev);
             }
 
@@ -971,6 +985,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 // Is the child less than fully scrolled?
                 // Then let the child handle it.
                 if (mScrollableViewHelper.getScrollableViewScrollPosition(mScrollableView, mIsSlidingUp) > 0) {
+                    Log.d("dispatchTouchEvent", "Child handle --> Dispatch event");
                     mIsScrollableViewHandlingTouch = true;
                     return super.dispatchTouchEvent(ev);
                 }
@@ -980,6 +995,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 // drag panel gets a proper down event.
                 if (mIsScrollableViewHandlingTouch) {
                     // Send an 'UP' event to the child.
+                    Log.d("dispatchTouchEvent", "After Child handle --> Send a Up");
                     MotionEvent up = MotionEvent.obtain(ev);
                     up.setAction(MotionEvent.ACTION_CANCEL);
                     super.dispatchTouchEvent(up);
@@ -987,6 +1003,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
                     // Send a 'DOWN' event to the panel. (We'll cheat
                     // and hijack this one)
+                    Log.d("dispatchTouchEvent", "After Child handle --> Send a down");
                     ev.setAction(MotionEvent.ACTION_DOWN);
                 }
 
@@ -996,6 +1013,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 // Is the panel less than fully expanded?
                 // Then we'll handle the drag here.
                 if (mSlideOffset < 1.0f) {
+                    Log.d("dispatchTouchEvent", "Expanding : OnTouchEvent");
                     mIsScrollableViewHandlingTouch = false;
                     return this.onTouchEvent(ev);
                 }
@@ -1006,12 +1024,14 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 if (!mIsScrollableViewHandlingTouch && mDragHelper.isDragging()) {
                     mDragHelper.cancel();
                     ev.setAction(MotionEvent.ACTION_DOWN);
+                    Log.d("dispatchTouchEvent", "After panel handle --> Send a down");
                 }
 
                 mIsScrollableViewHandlingTouch = true;
                 return super.dispatchTouchEvent(ev);
             }
         } else if (action == MotionEvent.ACTION_UP) {
+            Log.d("dispatchTouchEvent", "Action UP --> Clear dragging");
             // If the scrollable view was handling the touch and we receive an up
             // we want to clear any previous dragging state so we don't intercept a touch stream accidentally
             if (mIsScrollableViewHandlingTouch) {
@@ -1019,6 +1039,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             }
         }
 
+        Log.d("dispatchTouchEvent", "Otherwise, dispatch event");
         // In all other cases, just let the default behavior take over.
         return super.dispatchTouchEvent(ev);
     }
