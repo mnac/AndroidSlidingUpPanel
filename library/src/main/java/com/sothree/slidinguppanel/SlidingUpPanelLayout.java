@@ -906,7 +906,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
             case MotionEvent.ACTION_MOVE: {
                 Log.d("onInterceptTouchEvent", "Case: Action MOVE");
-                if ((ady > dragSlop && adx > ady)
+                if ((adx > dragSlop && adx > ady)
                         || canScroll(this, false, Math.round(x - mInitialMotionX), Math.round(x), Math.round(y))
                         || !isViewUnder(mDragView, (int) mInitialMotionX, (int) mInitialMotionY)) {
                     mDragHelper.cancel();
