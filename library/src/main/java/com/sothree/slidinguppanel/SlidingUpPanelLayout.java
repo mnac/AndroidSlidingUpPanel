@@ -14,6 +14,7 @@ import android.os.Parcelable;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -905,7 +906,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
             case MotionEvent.ACTION_MOVE: {
                 Log.d("onInterceptTouchEvent", "Case: Action MOVE");
-                if ((ady > dragSlop && adx > ady) || !isViewUnder(mDragView, (int) mInitialMotionX, (int) mInitialMotionY)) {
+                if ((ady > dragSlop && adx > ady)
+                        || canScroll(this, false, Math.round(x - mInitialMotionX), Math.round(x), Math.round(y))
+                        || !isViewUnder(mDragView, (int) mInitialMotionX, (int) mInitialMotionY)) {
                     mDragHelper.cancel();
                     mIsUnableToDrag = true;
                     return false;
@@ -1302,9 +1305,14 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 }
             }
         }
-        return checkV && ViewCompat.canScrollHorizontally(v, -dx);
+        return checkV && ViewCompat.canScrollHorizontally(v, -dx)||
+                ((v instanceof ViewPager) && canViewPagerScrollHorizontally((ViewPager) v, -dx));
     }
 
+    private boolean canViewPagerScrollHorizontally(ViewPager p, int dx) {
+        return !(dx < 0 && p.getCurrentItem() <= 0 ||
+                0 < dx && p.getAdapter().getCount() - 1 <= p.getCurrentItem());
+    }
 
     @Override
     protected ViewGroup.LayoutParams generateDefaultLayoutParams() {
