@@ -2,16 +2,16 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 
 group='com.github.mna'
-version = '0.1.0'
+version = '0.1.2'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:24.1.1'
-    compile 'com.android.support:support-annotations:24.1.1'
-    compile 'com.android.support:recyclerview-v7:24.1.1'
+    compile 'com.android.support:support-v4:24.2.0'
+    compile 'com.android.support:support-annotations:24.2.0'
+    compile 'com.android.support:recyclerview-v7:24.2.0'
     compile 'com.nineoldandroids:library:2.4.0'
 }
 
